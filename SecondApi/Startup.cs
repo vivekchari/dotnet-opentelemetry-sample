@@ -29,26 +29,28 @@ namespace SecondApi
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecondApi", Version = "v1" });
             });
 
             services.AddOpenTelemetryTracing((b) =>
-            {
-                b
-//                .AddSource("TelemetrySample.WebApp")
-                .AddAspNetCoreInstrumentation()
-                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TelemetryApp.SecondApi"))
-                .SetSampler(new AlwaysOnSampler())
-                .AddJaegerExporter(o =>
-                {
-                    o.AgentHost = Configuration["Settings:JaegerHost"];
-                    o.AgentPort = 6831;
-                })
-                .Build();
-            });
+                        {
+                            b
+                            .SetSampler(new AlwaysOnSampler())
+                            .AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TelemetryApp.SecondApi"))
+                            //.SetSampler(new AlwaysOnSampler())
+                            .AddJaegerExporter(o =>
+                            {
+                                o.AgentHost = Configuration["Settings:JaegerHost"];
+                                o.AgentPort = 6831;
+                            });
+                        });
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

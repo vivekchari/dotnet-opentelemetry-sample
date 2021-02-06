@@ -34,21 +34,22 @@ namespace FirstApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FirstApi", Version = "v1" });
             });
+            services.AddHttpClient();
 
             services.AddOpenTelemetryTracing((b) =>
-            {
-                b
-//                .AddSource("TelemetrySample.WebApp")
-                .AddAspNetCoreInstrumentation()
-                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TelemetryApp.FirstApi"))
-                .SetSampler(new AlwaysOnSampler())
-                .AddJaegerExporter(o =>
-                {
-                    o.AgentHost = Configuration["Settings:JaegerHost"];
-                    o.AgentPort = 6831;
-                })
-                .Build();
-            });
+                        {
+                            b
+                            .SetSampler(new AlwaysOnSampler())
+                            .AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TelemetryApp.FirstApi"))
+                            .AddJaegerExporter(o =>
+                            {
+                                o.AgentHost = Configuration["Settings:JaegerHost"];
+                                o.AgentPort = 6831;
+                            });
+                        });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

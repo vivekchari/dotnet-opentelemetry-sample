@@ -15,26 +15,33 @@ namespace WebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly static HttpClient client = new HttpClient();
+        private readonly IHttpClientFactory _clientFactory;
 
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, IHttpClientFactory clientFactory)
         {
             _logger = logger;
             _configuration = configuration;
+            _clientFactory = clientFactory;
         }
 
         public async Task<IActionResult> Index()
         {
+            // var activity = new Activity("CallToBackend").Start();
+
             var apiUrl = _configuration["Settings:ApiUrl"];
             _logger.LogInformation($"Calling Api Url: {apiUrl}/data");
+            var client = _clientFactory.CreateClient("FirstApiClient");
             HttpResponseMessage response = await client.GetAsync($"{apiUrl}/data");
             _logger.LogInformation($"Api response: {response.StatusCode}");
+            
+            
             if (response.IsSuccessStatusCode)
             {
                 var data = await response.Content.ReadAsAsync<IEnumerable<ApiResponse>>();
+                // activity.Stop();
                 return View(data);
             }          
-            
+            // activity.Stop();
             return View(Enumerable.Empty<ApiResponse>());            
         }
 

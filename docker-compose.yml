@@ -24,8 +24,8 @@ services:
     environment:
       - "ASPNETCORE_ENVIRONMENT=Development"
       - "ASPNETCORE_URLS=http://*:5001"
-      - "Settings__ApiUrl=http://host.docker.internal:7001"
-      - "Settings__JaegerHost=host.docker.internal"
+      - "Settings__ApiUrl=http://second-api:5002"
+      - "Settings__JaegerHost=jaeger-host"
   
   second-api:
     build: 
@@ -36,7 +36,7 @@ services:
     environment:
       - "ASPNETCORE_ENVIRONMENT=Development"
       - "ASPNETCORE_URLS=http://*:5002"
-      - "Settings__JaegerHost=host.docker.internal"
+      - "Settings__JaegerHost=jaeger-host"
   
   web-app:
     build:
@@ -47,7 +47,7 @@ services:
     environment:
       - "ASPNETCORE_ENVIRONMENT=Development"
       - "ASPNETCORE_URLS=http://*:5100"
-      - "Settings__ApiUrl=http://host.docker.internal:7000"
-      - "Settings__JaegerHost=host.docker.internal"
+      - "Settings__ApiUrl=http://first-api:5001"
+      - "Settings__JaegerHost=jaeger-host"
 
       

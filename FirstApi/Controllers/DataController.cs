@@ -15,12 +15,15 @@ namespace FirstApi.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<DataController> _logger;
-        private static readonly HttpClient client = new HttpClient();
+        private readonly IHttpClientFactory _clientFactory;
 
-        public DataController(ILogger<DataController> logger, IConfiguration configuration)
+        public DataController(ILogger<DataController> logger,
+            IConfiguration configuration,
+            IHttpClientFactory clientFactory)
         {
             _logger = logger;
             _configuration = configuration;
+            _clientFactory = clientFactory;
         }
 
         [HttpGet]
@@ -29,7 +32,8 @@ namespace FirstApi.Controllers
             _logger.LogInformation($"DataController GET called.");
             var secondApiUrl = _configuration["Settings:ApiUrl"];
             _logger.LogInformation($"Calling Api Url: {secondApiUrl}/data");
-
+            var client = _clientFactory.CreateClient("SecondApi");
+            
             var productTask1 = client.GetAsync($"{secondApiUrl}/stock/1");
             var productTask2 = client.GetAsync($"{secondApiUrl}/stock/2");
             var productTask3 = client.GetAsync($"{secondApiUrl}/stock/3");
@@ -37,15 +41,18 @@ namespace FirstApi.Controllers
             Task.WaitAll(productTask1, productTask2, productTask3);
 
             int stock1 = 0, stock2 = 0, stock3 = 0;
-            
-            if(productTask1.Result.IsSuccessStatusCode){
-                stock1 = await  productTask1.Result.Content.ReadAsAsync<int>();
+
+            if (productTask1.Result.IsSuccessStatusCode)
+            {
+                stock1 = await productTask1.Result.Content.ReadAsAsync<int>();
             }
-            if(productTask3.Result.IsSuccessStatusCode){
-                stock2 = await  productTask2.Result.Content.ReadAsAsync<int>();
+            if (productTask3.Result.IsSuccessStatusCode)
+            {
+                stock2 = await productTask2.Result.Content.ReadAsAsync<int>();
             }
-            if(productTask3.Result.IsSuccessStatusCode){
-                stock3 = await  productTask3.Result.Content.ReadAsAsync<int>();
+            if (productTask3.Result.IsSuccessStatusCode)
+            {
+                stock3 = await productTask3.Result.Content.ReadAsAsync<int>();
             }
 
             return new List<FirstApiResponse>{

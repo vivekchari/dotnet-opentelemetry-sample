@@ -29,20 +29,21 @@ namespace WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             Console.WriteLine($"host: {Configuration["Settings:JaegerHost"]}");
+            services.AddHttpClient();
             services.AddOpenTelemetryTracing((b) =>
             {
                 b
-//                .AddSource("TelemetrySample.WebApp")
-                .AddAspNetCoreInstrumentation()
-                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TelemetryApp.WebApp"))
                 .SetSampler(new AlwaysOnSampler())
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TelemetryApp.WebApp"))
                 .AddJaegerExporter(o =>
                 {
                     o.AgentHost = Configuration["Settings:JaegerHost"];
                     o.AgentPort = 6831;
-                })
-                .Build();
+                });
             });
+
             services.AddControllersWithViews();
         }
 
