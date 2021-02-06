@@ -33,16 +33,34 @@ namespace WebApp.Controllers
             var client = _clientFactory.CreateClient("FirstApiClient");
             HttpResponseMessage response = await client.GetAsync($"{apiUrl}/data");
             _logger.LogInformation($"Api response: {response.StatusCode}");
-            
-            
+
+
             if (response.IsSuccessStatusCode)
             {
                 var data = await response.Content.ReadAsAsync<IEnumerable<ApiResponse>>();
                 // activity.Stop();
                 return View(data);
-            }          
+            }
             // activity.Stop();
-            return View(Enumerable.Empty<ApiResponse>());            
+            return View(Enumerable.Empty<ApiResponse>());
+        }
+
+        public async Task<IActionResult> SpecialProducts()
+        {
+            var activity = Activity.Current;
+            activity.DisplayName = "GetSpecialProducts";
+            activity.SetTag("request.userid", "TestUser");
+            activity.AddEvent(new ActivityEvent("SpecialProductsRequested"));
+            var apiUrl = _configuration["Settings:ApiUrl"];
+            var client = _clientFactory.CreateClient("FirstApiClient");
+            HttpResponseMessage response = await client.GetAsync($"{apiUrl}/data/special");
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadAsAsync<IEnumerable<ApiResponse>>();
+                return View(data);
+            }
+
+            return View();
         }
 
         public IActionResult Privacy()

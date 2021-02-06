@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Prometheus;
 
 namespace FirstApi
 {
@@ -65,11 +66,12 @@ namespace FirstApi
 
             // app.UseHttpsRedirection();
             app.UseRouting();
-
-            // app.UseAuthorization();
+            app.UseMetricServer();
+            app.UseHttpMetrics();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapMetrics();
                 endpoints.MapControllers();
             });
         }

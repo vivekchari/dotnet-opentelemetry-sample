@@ -14,7 +14,30 @@ services:
       - 16686:16686
       - 14268:14268
       - 9411:9411
-  
+
+  prometheus-host:
+    container_name: proemetheus
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./data/prometheus:/etc/prometheus
+      - ./data/prometheus/data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+     - 3000:3000
+    container_name: grafana
+    restart: unless-stopped
+    links:
+      - prometheus-host:prometheus
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    depends_on:
+      - prometheus-host
+
   first-api:
     build: 
       context: ./FirstApi
@@ -49,5 +72,6 @@ services:
       - "ASPNETCORE_URLS=http://*:5100"
       - "Settings__ApiUrl=http://first-api:5001"
       - "Settings__JaegerHost=jaeger-host"
+      - "Settings__PrometheusHost=prometheus-host"
 
       

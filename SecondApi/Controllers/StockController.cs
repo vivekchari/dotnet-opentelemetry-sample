@@ -30,5 +30,17 @@ namespace SecondApi.Controllers
                 _ => 10
             };
         }
+
+         [HttpGet]
+        [Route("{id}/special")]
+        public int GetSpecialStock(int id)
+        {
+            return id switch 
+            {
+                1 => 4,
+                2 => 5,
+                _ => 10
+            };
+        }
     }
 }
