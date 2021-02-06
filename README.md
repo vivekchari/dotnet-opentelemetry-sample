@@ -10,7 +10,7 @@ To run the sample. Navigate to the scripts folder and execute the `Start.ps1` sc
 
 or if you'd like to start the services manually, you can run
 ```
-docker-compose up -d  --build  --force-recreate --no-deps  --remove-orphans
+docker-compose up -d  --build --force-recreate --remove-orphans
 ```
 
 Once all the services are up and running, you can navigate to [http://localhost:7100](http://localhost:7100) to open the web app. 
